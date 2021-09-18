@@ -12,6 +12,7 @@ impl NavController {
     fn load_route_data(&self, ctx: &mut EventCtx, data: &mut AppState) {
         match &data.route {
             Nav::Home => {}
+            Nav::MadeForYou => {}
             Nav::SavedTracks => {
                 if !data.library.saved_tracks.is_resolved() {
                     ctx.submit_command(library::LOAD_TRACKS);

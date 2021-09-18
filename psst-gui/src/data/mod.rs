@@ -3,6 +3,7 @@ mod artist;
 mod config;
 mod ctx;
 mod id;
+mod made_for_you;
 mod nav;
 mod playback;
 mod playlist;
@@ -26,6 +27,7 @@ pub use crate::data::{
     artist::{Artist, ArtistAlbums, ArtistDetail, ArtistLink, ArtistTracks},
     config::{AudioQuality, Authentication, Config, Preferences, PreferencesTab, Theme},
     ctx::Ctx,
+    made_for_you::{MadeForYou, MadeForYouKind, MadeForYouPlaylist},
     nav::{Nav, SpotifyUrl},
     playback::{
         NowPlaying, Playback, PlaybackOrigin, PlaybackPayload, PlaybackState, QueueBehavior,
@@ -329,5 +331,5 @@ pub type WithCtx<T> = Ctx<Arc<CommonCtx>, T>;
 
 #[derive(Clone, Data, Lens)]
 pub struct Personalized {
-    pub made_for_you: Promise<Vector<Playlist>>,
+    pub made_for_you: Promise<MadeForYou>,
 }

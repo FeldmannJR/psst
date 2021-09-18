@@ -18,6 +18,7 @@ pub mod album;
 pub mod artist;
 pub mod home;
 pub mod library;
+pub mod made_for_you;
 pub mod menu;
 pub mod playback;
 pub mod playlist;
@@ -160,9 +161,12 @@ fn route_widget() -> impl Widget<AppState> {
             }
             Nav::SavedAlbums => {
                 Scroll::new(library::saved_albums_widget().padding(theme::grid(1.0)))
-                    .vertical()
-                    .boxed()
+                .vertical()
+                .boxed()
             }
+            Nav::MadeForYou => made_for_you::made_for_you()
+                .padding(theme::grid(1.0))
+                .boxed(),
             Nav::SearchResults(_) => {
                 Scroll::new(search::results_widget().padding(theme::grid(1.0)))
                     .vertical()
@@ -204,6 +208,7 @@ fn sidebar_menu_widget() -> impl Widget<AppState> {
         .with_child(sidebar_link_widget("Home", Nav::Home))
         .with_child(sidebar_link_widget("Tracks", Nav::SavedTracks))
         .with_child(sidebar_link_widget("Albums", Nav::SavedAlbums))
+        .with_child(sidebar_link_widget("Made For You", Nav::MadeForYou))
         .with_child(search::input_widget().padding((theme::grid(1.0), theme::grid(1.0))))
 }
 
@@ -324,6 +329,7 @@ fn route_icon_widget() -> impl Widget<Nav> {
                 Nav::Home => Empty.boxed(),
                 Nav::SavedTracks => Empty.boxed(),
                 Nav::SavedAlbums => Empty.boxed(),
+                Nav::MadeForYou => Empty.boxed(),
                 Nav::SearchResults(_) => icon(&icons::SEARCH).boxed(),
                 Nav::AlbumDetail(_) => icon(&icons::ALBUM).boxed(),
                 Nav::ArtistDetail(_) => icon(&icons::ARTIST).boxed(),
