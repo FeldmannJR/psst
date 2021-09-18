@@ -1,7 +1,8 @@
 use crate::{
     data::{
-        Album, AlbumType, Artist, ArtistAlbums, AudioAnalysis, Cached, Nav, Page, Playlist, Range,
-        Recommendations, RecommendationsRequest, SearchResults, SpotifyUrl, Track, UserProfile,
+        Album, AlbumType, Artist, ArtistAlbums, AudioAnalysis, Cached, MadeForYou, MadeForYouKind,
+        MadeForYouPlaylist, Nav, Page, Playlist, Range, Recommendations, RecommendationsRequest,
+        SearchResults, SpotifyUrl, Track, UserProfile,
     },
     error::Error,
 };
@@ -345,19 +346,41 @@ impl WebApi {
 
 /// View endpoints.
 impl WebApi {
-    pub fn get_made_for_you(&self) -> Result<Vector<Playlist>, Error> {
-        #[derive(Deserialize)]
-        struct View {
+    pub fn get_made_for_you(&self) -> Result<MadeForYou, Error> {
+        #[derive(Deserialize, Clone)]
+        struct PlaylistAggregate {
+            id: Arc<str>,
             content: Page<Playlist>,
         }
-
+        #[derive(Deserialize)]
+        struct View {
+            content: Page<PlaylistAggregate>,
+        }
         let request = self
-            .get("v1/views/made-for-x")?
-            .query("types", "playlist")
+            .get("v1/views/made-for-x-hub")?
+            .query("plataform", "web")
             .query("limit", "20")
-            .query("offset", "0");
-        let result: View = self.load(request)?;
-        Ok(result.content.items)
+            .query("content_limit", "10")
+            .query("types", "album,playlist,artist.show,station");
+
+        let response: View = self.load(request)?;
+
+        let made_for_you: MadeForYou = response
+            .content
+            .items
+            .into_iter()
+            .filter(|aggregate| MadeForYouKind::from_id(Arc::clone(&aggregate.id)).is_some())
+            .flat_map(|aggregate| {
+                let playlist_type = MadeForYouKind::from_id(Arc::clone(&aggregate.id)).unwrap();
+                aggregate
+                    .content
+                    .items
+                    .into_iter()
+                    .map(move |playlist| MadeForYouPlaylist::new(playlist_type.clone(), playlist))
+            })
+            .collect();
+
+        Ok(made_for_you)
     }
 }
 

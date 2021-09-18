@@ -43,7 +43,7 @@ impl<T: Data> Cached<T> {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Page<T: Clone> {
     pub items: Vector<T>,
     pub limit: usize,
